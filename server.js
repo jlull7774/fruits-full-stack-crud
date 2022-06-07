@@ -91,7 +91,52 @@ app.get("/fruits", async (req, res) => {
   res.render("fruits/index.liquid", { fruits })
 })
 
+// new route
+
+app.get("/fruits/new", (req, res) => {
+  res.render("fruits/new.liquid")
+})
+
+// delete route
+
+app.delete("/fruits/:id", (req, res) => {
+  // get the id from params
+  const id = req.params.id
+  // delete the fruit
+  Fruit.findByIdAndRemove(id)
+    .then((fruit) => {
+      // redirect to main page after deleting
+      res.redirect("/fruits")
+    })
+    // send error as json
+    .catch((error) => {
+      console.log(error)
+      res.json({ error })
+    })
+})
+
+//update route
+
+app.put("/fruits/:id", (req, res) => {
+  // get the id from params
+  const id = req.params.id
+  // check if the readyToEat property should be true or false
+  req.body.readyToEat = req.body.readyToEat === "on" ? true : false
+  // update the fruit
+  Fruit.findByIdAndUpdate(id, req.body, { new: true })
+    .then((fruit) => {
+      // redirect to main page after updating
+      res.redirect("/fruits")
+    })
+    // send error as json
+    .catch((error) => {
+      console.log(error)
+      res.json({ error })
+    })
+})
+
 // create route
+
 app.post("/fruits", (req, res) => {
   // check if the readyToEat property should be true or false
   req.body.readyToEat = req.body.readyToEat === "on" ? true : false
@@ -108,10 +153,22 @@ app.post("/fruits", (req, res) => {
     })
 })
 
-// new route
+// edit route
 
-app.get("/fruits/new", (req, res) => {
-  res.render("fruits/new.liquid")
+app.get("/fruits/:id/edit", (req, res) => {
+  // get the id from params
+  const id = req.params.id
+  // get the fruit from the database
+  Fruit.findById(id)
+    .then((fruit) => {
+      // render edit page and send fruit data
+      res.render("fruits/edit.liquid", { fruit })
+    })
+    // send error as json
+    .catch((error) => {
+      console.log(error)
+      res.json({ error })
+    })
 })
 
 // show route
